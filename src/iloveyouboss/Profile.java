@@ -37,17 +37,17 @@ public class Profile {
 
         boolean kill = false;
         boolean anyMatches = false;
-        for (Criterion criterion : criteria) {
+        for (Criterion criterion : criteria) {  // criteria: null, 0, 1, many
             Answer answer = answers.get(
-                    criterion.getAnswer().getQuestionText());
+                    criterion.getAnswer().getQuestionText());   // criterion.getAnswer(): null, answer.get: exception
             boolean match =
-                    criterion.getWeight() == Weight.DontCare ||
-                            answer.match(criterion.getAnswer());
-            if (!match && criterion.getWeight() == Weight.MustMatch) {
+                    (criterion.getWeight() == Weight.DontCare) ||   // (criterion.getWeight() == Weight.DontCare) true,
+                            answer.match(criterion.getAnswer());    //  criterion.getWeight() == Weight.DontCare false && answer.match true or false
+            if (!match && criterion.getWeight() == Weight.MustMatch) { // (criterion.getWeight() == Weight.MustMatch) true or false
                 kill = true;
             }
             if (match) {
-                score += criterion.getWeight().getValue();
+                score += criterion.getWeight().getValue();  // score's value
             }
             anyMatches |= match;
             // ...
@@ -55,6 +55,19 @@ public class Profile {
         if (kill)
             return false;
         return anyMatches;
+//        (criteria = null) : exception
+//        (criterion.getAnswer() return null) : exception
+//        (criterion.getAnswer().getQuestionText() return null) : exception
+//        (answer.get return null) : exception
+
+//        (criteria has 0 elem) : return false, score == 0
+//        (criteria has 1 elem, criterion.getWeight() == Weight.DontCare) : score == criterion's value, return true
+//        (criteria has 1 elem, criterion.getWeight() != Weight.DontCare, answer.match() == true) : score == criterion's value, return true
+//        (criteria has 1 elem, criterion.getWeight() != Weight.DontCare, answer.match() == false, criterion.getWeight() == Weight.MustMatch) : score == 0, return false
+//        (criteria has n elem, criterions none match) : return false, score not change
+//        (criteria has n elem, criterions all match) : return true, score == sum(criterions' value)
+//        (criteria has n elem, m criterions match, no kill) : return true, score == sum(m criterions' value)
+//        (criteria has n elem, m criterions match, killed) : return false, score == sum(m criterions' value)
     }
 
     public int score() {
